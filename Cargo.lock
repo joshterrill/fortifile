@@ -243,21 +243,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9fc0510504f03c51ada170672ac806f1f105a88aa97a5281117e1ddc3368e51a"
 
 [[package]]
-name = "file-manager"
-version = "0.1.0"
-dependencies = [
- "aes",
- "block-modes",
- "block-padding 0.3.3",
- "docx-rs",
- "hex",
- "notify",
- "opener",
- "rand",
- "tempfile",
-]
-
-[[package]]
 name = "filetime"
 version = "0.2.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -277,6 +262,21 @@ checksum = "5f54427cfd1c7829e2a139fcefea601bf088ebca651d2bf53ebc600eac295dae"
 dependencies = [
  "crc32fast",
  "miniz_oxide 0.7.4",
+]
+
+[[package]]
+name = "fortifile"
+version = "0.1.0"
+dependencies = [
+ "aes",
+ "block-modes",
+ "block-padding 0.3.3",
+ "docx-rs",
+ "hex",
+ "notify",
+ "opener",
+ "rand",
+ "tempfile",
 ]
 
 [[package]]
