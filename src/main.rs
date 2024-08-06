@@ -72,7 +72,7 @@ fn handle_file(file_path: &str) -> Result<(), notify::Error> {
 
     let (tx, rx) = channel();
     let mut watcher: RecommendedWatcher = Watcher::new(tx, Config::default().with_poll_interval(Duration::from_secs(1)))?;
-    watcher.watch(Path::new(decrypted_path.to_str().unwrap()), RecursiveMode::NonRecursive)?;
+    watcher.watch(Path::new(decrypted_path.to_str().unwrap()), RecursiveMode::NonRecursive).unwrap();
 
     log_message("Opening file in default app...");
     opener::open(decrypted_path.to_str().unwrap()).unwrap();
@@ -111,7 +111,7 @@ fn handle_file(file_path: &str) -> Result<(), notify::Error> {
     })
 }
 
-fn main() -> notify::Result<()> {
+fn main() {
     let mut event_loop = EventLoop::new();
 
     event_loop.set_activation_policy(ActivationPolicy::Prohibited);
@@ -124,11 +124,21 @@ fn main() -> notify::Result<()> {
                 event: WindowEvent::DroppedFile(file_path),
                 ..
             } => {
-                handle_file(file_path.to_str().unwrap()).unwrap();
+                let path = file_path.to_str().unwrap();
+                if path.contains(".enc") {
+                    handle_file(path).unwrap();
+                } else {
+                    encrypt_file(path, &format!("{}.enc", path), KEY, IV).unwrap();
+                }
                 *control_flow = ControlFlow::Exit;
             },
             Event::Opened { urls } => {
-                handle_file(urls[0].path()).unwrap();
+                let path =  urls[0].path();
+                if path.contains(".enc") {
+                    handle_file(path).unwrap();
+                } else {
+                    encrypt_file(path, &format!("{}.enc", path), KEY, IV).unwrap();
+                }
                 *control_flow = ControlFlow::Exit;
             },
             Event::LoopDestroyed => return,
