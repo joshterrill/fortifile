@@ -18,45 +18,63 @@
     <string>1.0</string>
     <key>CFBundleVersion</key>
     <string>1.0</string>
+    <key>LSBackgroundOnly</key>
+    <string>1</string>
+
     <key>CFBundleDocumentTypes</key>
     <array>
         <dict>
             <key>CFBundleTypeName</key>
-            <string>ENC File</string>
+            <string>FortiFile Encoded File</string>
             <key>CFBundleTypeRole</key>
             <string>Editor</string>
             <key>LSHandlerRank</key>
             <string>Owner</string>
             <key>LSItemContentTypes</key>
             <array>
-                <string>com.example.enc</string>
+                <string>public.data</string>
+            </array>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>enc</string>
             </array>
         </dict>
     </array>
-    <key>UTExportedTypeDeclarations</key>
+
+    <key>CFBundleURLTypes</key>
     <array>
         <dict>
-            <key>UTTypeIdentifier</key>
-            <string>com.example.enc</string>
-            <key>UTTypeDescription</key>
-            <string>ENC File</string>
-            <key>UTTypeConformsTo</key>
+            <key>CFBundleURLName</key>
+            <string>com.example.FortiFile</string>
+            <key>CFBundleURLSchemes</key>
             <array>
-                <string>public.data</string>
-                <string>public.item</string>
+                <string>fortifile</string>
             </array>
-            <key>UTTypeTagSpecification</key>
-            <dict>
-                <key>public.filename-extension</key>
-                <array>
-                    <string>enc</string>
-                </array>
-                <key>public.mime-type</key>
-                <string>application/x-enc</string>
-            </dict>
         </dict>
     </array>
+
     <key>NSDocumentsFolderUsageDescription</key>
     <string>This application needs access to your documents to manage encrypted files.</string>
+
+    <!-- Enable drag-and-drop support -->
+    <key>CFBundleDocumentTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeName</key>
+            <string>FortiFile Encoded File</string>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>LSHandlerRank</key>
+            <string>Owner</string>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>public.data</string>
+            </array>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>enc</string> <!-- Your custom file extension -->
+            </array>
+        </dict>
+    </array>
 </dict>
 </plist>

@@ -2,14 +2,16 @@ use aes::Aes128;
 use block_modes::{BlockMode, Cbc};
 use block_modes::block_padding::Pkcs7;
 use notify::{RecommendedWatcher, RecursiveMode, Watcher, Config};
-use std::env;
 use std::fs::{File, remove_file, metadata, OpenOptions};
 use std::io::{Read, Write};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::sync::mpsc::channel;
 use std::thread::sleep;
 use std::time::Duration;
 use tempfile::tempdir;
+use tao::event::{Event, WindowEvent};
+use tao::event_loop::{ControlFlow, EventLoop};
+use tao::platform::macos::{ActivationPolicy, EventLoopExtMacOS};
 
 type Aes128Cbc = Cbc<Aes128, Pkcs7>;
 
@@ -51,25 +53,16 @@ fn log_message(message: &str) {
     writeln!(log_file, "{}", message).unwrap();
 }
 
-fn main() -> notify::Result<()> {
-    let args: Vec<String> = env::args().collect();
-    log_message(&format!("Received arguments: {:?}", args));
+fn handle_file(file_path: &str) -> Result<(), notify::Error> {
 
-    if args.len() != 2 {
-        eprintln!("Usage: {} <path to .enc file>", args[0]);
-        log_message("Incorrect number of arguments.");
-        return Ok(());
-    }
-
-    let encrypted_path = &args[1];
     let temp_dir = tempdir().unwrap();
     let decrypted_path = temp_dir.path().join("test-original.docx");
     let temp_file_path = temp_dir.path().join("~$st-original.docx");
 
-    log_message(&format!("Starting decryption... Encrypted path: {}, Decrypted path: {:?}", encrypted_path, decrypted_path));
-    log_message(&format!("Checking permissions for encrypted path: {:?}", metadata(encrypted_path)));
+    log_message(&format!("Starting decryption... Encrypted path: {}, Decrypted path: {:?}", file_path, decrypted_path));
+    log_message(&format!("Checking permissions for encrypted path: {:?}", metadata(file_path)));
 
-    if let Err(e) = decrypt_file(encrypted_path, decrypted_path.to_str().unwrap(), KEY, IV) {
+    if let Err(e) = decrypt_file(file_path, decrypted_path.to_str().unwrap(), KEY, IV) {
         eprintln!("Error decrypting file: {}", e);
         log_message(&format!("Error decrypting file: {}", e));
         return Ok(());
@@ -89,11 +82,11 @@ fn main() -> notify::Result<()> {
     // sleep for 5 seconds
     sleep(Duration::from_secs(5));
 
-    loop {
+    Ok(loop {
         if metadata(temp_file_path.to_str().unwrap()).is_err() {
             log_message("Temporary file disappeared, encrypting the updated file...");
 
-            if let Err(e) = encrypt_file(decrypted_path.to_str().unwrap(), encrypted_path, KEY, IV) {
+            if let Err(e) = encrypt_file(decrypted_path.to_str().unwrap(), file_path, KEY, IV) {
                 eprintln!("Error encrypting file: {}", e);
                 log_message(&format!("Error encrypting file: {}", e));
             } else {
@@ -115,7 +108,31 @@ fn main() -> notify::Result<()> {
         }
 
         sleep(Duration::from_secs(1));
-    }
+    })
+}
 
-    Ok(())
+fn main() -> notify::Result<()> {
+    let mut event_loop = EventLoop::new();
+
+    event_loop.set_activation_policy(ActivationPolicy::Prohibited);
+
+    event_loop.run(move |event, _, control_flow| {
+        *control_flow = ControlFlow::Wait;
+
+        match event {
+            Event::WindowEvent {
+                event: WindowEvent::DroppedFile(file_path),
+                ..
+            } => {
+                handle_file(file_path.to_str().unwrap()).unwrap();
+                *control_flow = ControlFlow::Exit;
+            },
+            Event::Opened { urls } => {
+                handle_file(urls[0].path()).unwrap();
+                *control_flow = ControlFlow::Exit;
+            },
+            Event::LoopDestroyed => return,
+            _ => (),
+        }
+    });
 }

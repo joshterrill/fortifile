@@ -2,6 +2,7 @@
 name = "fortifile"
 version = "0.1.0"
 edition = "2021"
+description = "A simple one-click file encrypter and decrypter"
 
 [dependencies]
 docx-rs = "0.3.0"
@@ -13,6 +14,10 @@ rand = "*"
 notify = "5.0.0-pre.14"
 opener = "*"
 tempfile = "*"
+tao = "0.28.1"
 
-[dev-dependencies]
-tempfile = "3.2.0"
+[package.metadata.bundle]
+name = "FortiFile"
+identifier = "com.jt.FortiFile"
+version = "1.0.0"
+# icon = "path/to/icon.icns"

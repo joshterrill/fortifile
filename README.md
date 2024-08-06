@@ -4,8 +4,10 @@
 ### Build and distribute
 
 ```bash
-cargo build --release
-cp target/release/fortifile FortiFile.app/Contents/MacOS/FortiFile
-chmod 777 FortiFile.app/Contents/MacOS/*
-cp -R FortiFile.app/ /Applications/FortiFile.app/
+cargo install cargo-bundle
+./build.sh
 ```
+
+### Todo
+
+* If no file is opened or dropped, open up a window that lets you drag a file onto the window and encrypt it.
